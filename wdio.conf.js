@@ -1,3 +1,6 @@
+const path = require('path');
+const os = require('os');
+const fs = require('fs');
 const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-profile-'));
 
 exports.config = {
