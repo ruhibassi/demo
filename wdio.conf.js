@@ -5,21 +5,19 @@ const fs = require('fs');
 exports.config = {
     runner: 'local',
 
-    specs: [
-        './test/spec/**/*.js'
-    ],
+    specs: ['./test/spec/**/*.js'],
     exclude: [],
-
-    maxInstances: 10,
+    maxInstances: 1,
 
     capabilities: [{
         browserName: 'chrome',
         'goog:chromeOptions': {
             args: [
+                '--headless=new',              // ✅ NEW headless mode
+                '--disable-gpu',
                 '--disable-infobars',
                 '--disable-dev-shm-usage',
                 '--no-sandbox'
-                // We'll dynamically add --user-data-dir in beforeSession
             ],
             prefs: {
                 'profile.password_manager_leak_detection': false
@@ -35,7 +33,6 @@ exports.config = {
     waitforTimeout: 10000,
     connectionRetryTimeout: 120000,
     connectionRetryCount: 3,
-
     framework: 'mocha',
     reporters: ['spec'],
 
@@ -45,10 +42,17 @@ exports.config = {
     },
 
     /**
-     * Hook to dynamically assign a unique Chrome profile dir per session
+     * ✅ Assign unique temp folder for each run
      */
     beforeSession: function (config, capabilities, specs, cid) {
-        const uniqueDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-profile-'));
-        capabilities['goog:chromeOptions'].args.unshift(`--user-data-dir=${uniqueDir}`);
+        const fallbackDir = path.join(__dirname, `tmp_profile_${cid}`);
+        try {
+            const uniqueDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-profile-'));
+            capabilities['goog:chromeOptions'].args.unshift(`--user-data-dir=${uniqueDir}`);
+        } catch (err) {
+            console.warn('⚠ Failed to create tmp folder, using fallback:', fallbackDir);
+            fs.mkdirSync(fallbackDir, { recursive: true });
+            capabilities['goog:chromeOptions'].args.unshift(`--user-data-dir=${fallbackDir}`);
+        }
     }
 };
