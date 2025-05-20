@@ -49,9 +49,16 @@ exports.config = {
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://saucelabs.com/platform/platform-configurator
     //
-    capabilities: [{
-        browserName: 'chrome'
-    }],
+    capabilities:[{
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          args: [
+            '--disable-infobars',
+            '--disable-dev-shm-usage',
+            '--no-sandbox'
+          ]
+        }
+      }],
 
     //
     // ===================
