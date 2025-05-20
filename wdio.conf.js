@@ -1,3 +1,5 @@
+const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-profile-'));
+
 exports.config = {
     //
     // ====================
@@ -53,6 +55,7 @@ exports.config = {
         browserName: 'chrome',
         'goog:chromeOptions': {
           args: [
+            `--user-data-dir=${userDataDir}`,
             '--disable-infobars',
             '--disable-dev-shm-usage',
             '--no-sandbox'
